@@ -1,7 +1,7 @@
 package com.todo.springadvancetask.controller;
 
-import com.todo.springadvancetask.dto.ScheduleRequestDto;
-import com.todo.springadvancetask.dto.ScheduleResponseDto;
+import com.todo.springadvancetask.dto.schedule.ScheduleRequestDto;
+import com.todo.springadvancetask.dto.schedule.ScheduleResponseDto;
 import com.todo.springadvancetask.service.ScheduleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,10 +1,9 @@
 package com.todo.springadvancetask.service;
 
-import com.todo.springadvancetask.dto.ScheduleRequestDto;
-import com.todo.springadvancetask.dto.ScheduleResponseDto;
+import com.todo.springadvancetask.dto.schedule.ScheduleRequestDto;
+import com.todo.springadvancetask.dto.schedule.ScheduleResponseDto;
 import com.todo.springadvancetask.entity.Schedule;
 import com.todo.springadvancetask.repository.ScheduleRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service

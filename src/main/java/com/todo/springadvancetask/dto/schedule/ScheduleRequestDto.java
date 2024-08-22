@@ -1,4 +1,4 @@
-package com.todo.springadvancetask.dto;
+package com.todo.springadvancetask.dto.schedule;
 
 import lombok.Getter;
 

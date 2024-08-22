@@ -1,4 +1,4 @@
-package com.todo.springadvancetask.dto;
+package com.todo.springadvancetask.dto.schedule;
 
 import com.todo.springadvancetask.entity.Schedule;
 import java.time.LocalDateTime;
@@ -9,6 +9,7 @@ import lombok.Getter;
 public class ScheduleResponseDto {
 
   Long id;
+  String name;
   String title;
   String contents;
   String createdAt;
@@ -17,6 +18,7 @@ public class ScheduleResponseDto {
 
   public ScheduleResponseDto(Schedule schedule) {
     this.id = schedule.getId();
+    this.name = schedule.getUserName();
     this.title = schedule.getTitle();
     this.contents = schedule.getContents();
     this.createdAt = schedule.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
