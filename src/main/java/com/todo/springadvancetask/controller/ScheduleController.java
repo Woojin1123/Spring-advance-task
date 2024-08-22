@@ -25,7 +25,8 @@ public class ScheduleController {
 
   @GetMapping("/{id}") //단건조회
   public ResponseEntity getScheduleById(@PathVariable Long id) {
-    return null;
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(scheduleService.findById(id));
   }
 
   @GetMapping // 전체조회
@@ -35,13 +36,15 @@ public class ScheduleController {
 
   @PostMapping
   public ResponseEntity createSchedule(@RequestBody ScheduleRequestDto requestDto) {
-    ScheduleResponseDto responseDto = scheduleService.save(requestDto);
+    ScheduleResponseDto responseDto = scheduleService.createSchedule(requestDto);
     return ResponseEntity.status(HttpStatus.OK)
         .body(responseDto);
   }
 
-  @PutMapping
-  public ResponseEntity updateSchedule(ScheduleRequestDto requestDto) {
-    return null;
+  @PutMapping("/{id}")
+  public ResponseEntity updateSchedule(@PathVariable Long id,@RequestBody ScheduleRequestDto requestDto) {
+    ScheduleResponseDto responseDto = scheduleService.updateSchedule(id, requestDto);
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(responseDto);
   }
 }
