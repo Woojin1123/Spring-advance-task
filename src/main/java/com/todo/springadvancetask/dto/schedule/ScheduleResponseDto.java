@@ -8,7 +8,7 @@ import lombok.Getter;
 public class ScheduleResponseDto {
 
   Long id;
-  String name;
+  Long userId;
   String title;
   String contents;
   String createdAt;
@@ -18,7 +18,7 @@ public class ScheduleResponseDto {
 
   public ScheduleResponseDto(Schedule schedule) {
     this.id = schedule.getId();
-    this.name = schedule.getUserName();
+    this.userId = schedule.getUserId();
     this.title = schedule.getTitle();
     this.contents = schedule.getContents();
     this.createdAt = schedule.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));

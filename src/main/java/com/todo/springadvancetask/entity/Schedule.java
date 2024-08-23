@@ -28,32 +28,38 @@ public class Schedule extends Timestamped {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   Long id;
   @NonNull
-  @Column(name = "user_name", nullable = false)
-  String userName;
+  @Column(name = "user_id", nullable = false)
+  Long userId;
   @NonNull
-  @Column(name = "title" , nullable = false, length = 50)
+  @Column(name = "title", nullable = false, length = 50)
   String title;
   @NonNull
   @Column(name = "contents", nullable = false, length = 200)
   String contents;
 
-  @OneToMany(mappedBy = "schedule",cascade = CascadeType.REMOVE)
+  @OneToMany(mappedBy = "schedule", cascade = CascadeType.REMOVE)
   private List<Comment> commentList = new ArrayList<>();
 
+  @OneToMany(mappedBy = "schedule")
+  private List<UserSchedule> userScheduleList = new ArrayList<>();
+
   public Schedule(ScheduleRequestDto requestDto) {
-    this.userName = requestDto.getUserName();
+    this.userId = requestDto.getUserId();
     this.contents = requestDto.getContents();
     this.title = requestDto.getTitle();
   }
 
-  public void update(ScheduleRequestDto requestDto){
-    this.userName = requestDto.getUserName();
+  public void update(ScheduleRequestDto requestDto) {
+    this.userId = requestDto.getUserId();
     this.contents = requestDto.getContents();
     this.title = requestDto.getTitle();
   }
-  public void addCommentList(Comment comment){
+
+  public void addCommentList(Comment comment) {
     this.commentList.add(comment);
     comment.setSchedule(this);//연관 관계 설정
-  };
+  }
+
+  ;
 
 }
