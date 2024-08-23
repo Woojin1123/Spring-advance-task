@@ -7,18 +7,18 @@ import lombok.Getter;
 @Getter
 public class ScheduleResponseDto {
 
-  Long id;
-  String name;
-  String title;
-  String contents;
-  String createdAt;
-  String updatedAt;
-  int commentCnt;
+  private Long id;
+  private Long userId;
+  private String title;
+  private String contents;
+  private String createdAt;
+  private String updatedAt;
+  private int commentCnt;
 
 
   public ScheduleResponseDto(Schedule schedule) {
     this.id = schedule.getId();
-    this.name = schedule.getUserName();
+    this.userId = schedule.getUserId();
     this.title = schedule.getTitle();
     this.contents = schedule.getContents();
     this.createdAt = schedule.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
