@@ -12,8 +12,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
   List<Comment> findAllByScheduleId(Long scheduleId);
 
-  @Query("SELECT COALESCE(MAX(c.sCommentId)+1, 1) "
+  @Query("SELECT COALESCE(MAX(c.regId)+1, 1) "
       + "FROM Comment c "
       + "WHERE c.schedule.id =:id")
-  Long findCommentId(@Param("id") Long scheduleId);
+  Long findRegId(@Param("id") Long scheduleId);
 }

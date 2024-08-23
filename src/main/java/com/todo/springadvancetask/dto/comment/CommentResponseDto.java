@@ -9,20 +9,20 @@ public class CommentResponseDto {
 
 
   private Long schduleId;
-  private Long sCommentId;
+  private Long regId;
   private String name;
   private String contents;
   private String createdAt;
   private String updatedAt;
-  private Long commentCnt;
+  private Long commentId;
 
   public CommentResponseDto(Comment comment) {
     this.schduleId = comment.getSchedule().getId();
-    this.sCommentId = comment.getSCommentId();
+    this.regId = comment.getRegId();
     this.name = comment.getName();
     this.contents = comment.getContents();
     this.createdAt = comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     this.updatedAt = comment.getUpdatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-    this.commentCnt = comment.getId();
+    this.commentId = comment.getId();
   }
 }

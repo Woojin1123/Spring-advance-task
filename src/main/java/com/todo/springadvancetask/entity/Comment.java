@@ -24,10 +24,12 @@ public class Comment extends Timestamped {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   @Setter
-  @Column(name = "s_comment_id")
-  Long sCommentId;
+  @Column(name = "register_id")
+  Long regId;
+  @Setter
   @Column(name = "contents", nullable = false, length = 100)
   String contents;
+  @Setter
   @Column(name = "user_name", nullable = false)
   String name;
 
