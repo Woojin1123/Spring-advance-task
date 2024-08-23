@@ -1,7 +1,6 @@
 package com.todo.springadvancetask.dto.schedule;
 
 import com.todo.springadvancetask.entity.Schedule;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import lombok.Getter;
 
@@ -14,6 +13,7 @@ public class ScheduleResponseDto {
   String contents;
   String createdAt;
   String updatedAt;
+  int commentCnt;
 
 
   public ScheduleResponseDto(Schedule schedule) {
@@ -23,5 +23,6 @@ public class ScheduleResponseDto {
     this.contents = schedule.getContents();
     this.createdAt = schedule.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     this.updatedAt = schedule.getUpdatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    this.commentCnt = schedule.getCommentList().size();
   }
 }

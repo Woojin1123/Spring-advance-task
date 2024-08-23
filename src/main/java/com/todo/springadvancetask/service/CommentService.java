@@ -6,10 +6,10 @@ import com.todo.springadvancetask.entity.Comment;
 import com.todo.springadvancetask.entity.Schedule;
 import com.todo.springadvancetask.repository.CommentRepository;
 import com.todo.springadvancetask.repository.ScheduleRepository;
-import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CommentService {
@@ -92,7 +92,7 @@ public class CommentService {
       if (comment.getRegId() == regId) {
         comment.setName(requestDto.getName());
         comment.setContents(requestDto.getContents());
-
+        commentRepository.flush();
         return new CommentResponseDto(comment);
       }
     }
@@ -105,6 +105,7 @@ public class CommentService {
         .orElseThrow();
     comment.setContents(requestDto.getContents());
     comment.setName(requestDto.getName());
+    commentRepository.flush();
     CommentResponseDto responseDto = new CommentResponseDto(comment);
     return responseDto;
   }

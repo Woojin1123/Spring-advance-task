@@ -85,9 +85,9 @@ public class CommentController {
   @DeleteMapping("/{scheduleId}/comments/{regId}")
   public ResponseEntity<Long> deleteByRegId(@PathVariable Long scheduleId,
       @PathVariable Long regId) {
-    Long id = commentService.deleteByRegId(scheduleId, regId);
+    Long deletedId = commentService.deleteByRegId(scheduleId, regId);
     return ResponseEntity.status(HttpStatus.ACCEPTED)
-        .body(id);
+        .body(deletedId);
   }
 
   @DeleteMapping("/comments/{commentId}")

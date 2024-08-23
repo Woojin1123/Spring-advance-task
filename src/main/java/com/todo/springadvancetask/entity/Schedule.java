@@ -1,6 +1,7 @@
 package com.todo.springadvancetask.entity;
 
 import com.todo.springadvancetask.dto.schedule.ScheduleRequestDto;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,7 +37,7 @@ public class Schedule extends Timestamped {
   @Column(name = "contents", nullable = false, length = 200)
   String contents;
 
-  @OneToMany(mappedBy = "schedule")
+  @OneToMany(mappedBy = "schedule",cascade = CascadeType.REMOVE)
   private List<Comment> commentList = new ArrayList<>();
 
   public Schedule(ScheduleRequestDto requestDto) {
@@ -46,6 +47,7 @@ public class Schedule extends Timestamped {
   }
 
   public void update(ScheduleRequestDto requestDto){
+    this.userName = requestDto.getUserName();
     this.contents = requestDto.getContents();
     this.title = requestDto.getTitle();
   }
