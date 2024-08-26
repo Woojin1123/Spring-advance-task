@@ -3,6 +3,7 @@ package com.todo.springadvancetask.service;
 import com.todo.springadvancetask.dto.user.UserRequestDto;
 import com.todo.springadvancetask.dto.user.UserResponseDto;
 import com.todo.springadvancetask.entity.User;
+import com.todo.springadvancetask.entity.Managed;
 import com.todo.springadvancetask.repository.UserRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,12 @@ public class UserService {
     this.userRepository = userRepository;
   }
 
+  @Transactional
   public UserResponseDto createUser(UserRequestDto requestDto) {
     User user = new User(requestDto);
     User saveUser = userRepository.save(user);
+    Managed managed = new Managed();
+    managed.setUser(user);
     UserResponseDto responseDto = new UserResponseDto(saveUser);
     return responseDto;
   }
@@ -38,8 +42,9 @@ public class UserService {
   }
 
   @Transactional
-  public UserResponseDto updateUser(Long userId,UserRequestDto requestDto) {
-    User user = userRepository.findById(userId).orElseThrow();
+  public UserResponseDto updateUser(Long userId, UserRequestDto requestDto) {
+    User user = userRepository.findById(userId)
+        .orElseThrow();
     user.setName(requestDto.getName());
     user.setEmail(requestDto.getEmail());
 

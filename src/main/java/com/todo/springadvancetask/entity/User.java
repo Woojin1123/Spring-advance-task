@@ -8,8 +8,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,10 +32,14 @@ public class User extends Timestamped{
   private String email;
 
   @OneToMany(mappedBy = "user")
-  private List<UserSchedule> userScheduleList = new ArrayList<>();
+  private Set<Managed> managedList = new HashSet<>();
 
   public User(UserRequestDto requestDto) {
     this.name = requestDto.getName();
     this.email = requestDto.getEmail();
+  }
+  public void addUserScheduleList(Managed managed) {
+    this.managedList.add(managed);
+    managed.setUser(this);//연관 관계 설정
   }
 }

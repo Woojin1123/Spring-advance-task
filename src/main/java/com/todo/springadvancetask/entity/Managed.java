@@ -7,20 +7,26 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Table(name = "user_schedule")
-public class UserSchedule {
+@Getter
+@Table(name = "managed")
+public class Managed {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @ManyToOne
+  @Setter
   @JoinColumn(name = "user_id")
   private User user;
 
   @ManyToOne
+  @Setter
   @JoinColumn(name = "schedule_id")
   private Schedule schedule;
+
 }
