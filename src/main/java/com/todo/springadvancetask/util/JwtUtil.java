@@ -114,7 +114,7 @@ public class JwtUtil {
     }
   }
 
-  public String substrirngToken(String tokenvalue) {
+  public String subStringToken(String tokenvalue) {
     if(StringUtils.hasText(tokenvalue) && tokenvalue.startsWith(BEARER_PREFIX)){
       return tokenvalue.substring(7);
     }

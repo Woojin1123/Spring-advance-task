@@ -4,6 +4,8 @@ import com.todo.springadvancetask.config.PasswordEncoder;
 import com.todo.springadvancetask.dto.user.UserRequestDto;
 import com.todo.springadvancetask.dto.user.UserResponseDto;
 import com.todo.springadvancetask.entity.User;
+import com.todo.springadvancetask.exception.ErrorCode;
+import com.todo.springadvancetask.exception.custom.AuthorizationException;
 import com.todo.springadvancetask.repository.UserRepository;
 import com.todo.springadvancetask.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,8 +32,10 @@ public class UserService {
     User user = new User(requestDto);
     user.setPwd(passwordEncoder.encode(requestDto.getPwd()));
     User saveUser = userRepository.save(user);
-    String token = jwtUtil.createToken(saveUser.getEmail());
-    jwtUtil.addJwtToCookie(token, res);
+    String token = jwtUtil.createToken(user.getEmail());
+    res.addHeader("Authorization", token);
+//    jwtUtil.addJwtToCookie(token,res);
+//    쿠키활용
     UserResponseDto responseDto = new UserResponseDto(saveUser);
     return responseDto;
   }
@@ -69,11 +73,12 @@ public class UserService {
     String pwd = requestDto.getPwd();
     User user = userRepository.findByEmail(email)
         .orElseThrow(() -> new NullPointerException("해당 사용자가 없습니다."));
-    if(!passwordEncoder.matches(pwd,user.getPwd())){
-      throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+    if (!passwordEncoder.matches(pwd, user.getPwd())) {
+      throw new AuthorizationException(ErrorCode.LOGIN_FAILED);
     }
     String token = jwtUtil.createToken(user.getEmail());
-    res.addHeader("Authorization",token);
-    jwtUtil.addJwtToCookie(token,res);
+    res.addHeader("Authorization", token);
+//    jwtUtil.addJwtToCookie(token,res);
+    // 쿠키 활용
   }
 }

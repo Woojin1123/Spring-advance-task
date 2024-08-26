@@ -4,12 +4,14 @@ import com.todo.springadvancetask.entity.User;
 import com.todo.springadvancetask.repository.UserRepository;
 import com.todo.springadvancetask.util.JwtUtil;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
@@ -38,22 +40,32 @@ public class AuthFilter implements Filter {
     if (StringUtils.hasText(url) && (url.equals("/api/users") || url.equals("/api/users/login"))) {
       chain.doFilter(request, response);
     } else {
-      String tokenvalue = jwtUtil.getJwtFromHeader(servletRequest);
-      if (StringUtils.hasText(tokenvalue)) {
-        String token = tokenvalue;
-        if (!jwtUtil.validateToken(token)) {
-          throw new IllegalArgumentException("토큰 에러");
-        }
+      try {
+        String tokenvalue = jwtUtil.getJwtFromHeader(servletRequest);
+        if (StringUtils.hasText(tokenvalue)) {
+          String token = tokenvalue;
 
-        Claims info = jwtUtil.getUserInfoFromToken(token);
-        User user = userRepository.findByEmail(info.getSubject())
-            .orElseThrow(
-                () -> new NullPointerException("유저가 존재하지 않습니다.")
-            );
-        request.setAttribute("user", user);
-        chain.doFilter(request, response);
-      } else {
-        throw new IllegalArgumentException("토큰이 없습니다.");
+          Claims info = jwtUtil.getUserInfoFromToken(token);
+          User user = userRepository.findByEmail(info.getSubject())
+              .orElseThrow(
+                  () -> new NullPointerException("유저가 존재하지 않습니다.") // exception따로 구현
+              );
+
+          request.setAttribute("user", user);
+          chain.doFilter(request, response);
+        } else {
+          HttpServletResponse res = (HttpServletResponse) response;
+          res.setStatus(400);
+          res.setCharacterEncoding("utf-8");
+          res.getWriter()
+              .write("토큰이 존재하지 않습니다.");
+        }
+      }catch (ExpiredJwtException e){
+        HttpServletResponse res = (HttpServletResponse) response;
+        res.setStatus(401);
+        res.setCharacterEncoding("utf-8");
+        res.getWriter()
+            .write("토큰이 만료되었습니다.");
       }
     }
   }
