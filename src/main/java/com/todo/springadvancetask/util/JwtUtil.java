@@ -113,4 +113,11 @@ public class JwtUtil {
       logger.error(e.getMessage());
     }
   }
+
+  public String substrirngToken(String tokenvalue) {
+    if(StringUtils.hasText(tokenvalue) && tokenvalue.startsWith(BEARER_PREFIX)){
+      return tokenvalue.substring(7);
+    }
+    throw new NullPointerException("토큰이 존재하지 않습니다.");
+  }
 }
