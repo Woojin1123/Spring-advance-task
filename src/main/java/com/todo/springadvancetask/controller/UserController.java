@@ -62,4 +62,10 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK)
         .body(userId);
   }
+
+  @PostMapping("/login")
+  public ResponseEntity<String> login(@RequestBody UserRequestDto requestDto, HttpServletResponse res){
+    userService.login(requestDto,res);
+    return ResponseEntity.status(HttpStatus.OK).body("로그인 성공");
+  }
 }

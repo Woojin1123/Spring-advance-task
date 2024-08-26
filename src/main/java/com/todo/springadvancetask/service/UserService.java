@@ -17,6 +17,7 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtUtil jwtUtil;
+
   public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
       JwtUtil jwtUtil) {
     this.userRepository = userRepository;
@@ -30,7 +31,7 @@ public class UserService {
     user.setPwd(passwordEncoder.encode(requestDto.getPwd()));
     User saveUser = userRepository.save(user);
     String token = jwtUtil.createToken(saveUser.getEmail());
-    jwtUtil.addJwtToCookie(token,res);
+    jwtUtil.addJwtToCookie(token, res);
     UserResponseDto responseDto = new UserResponseDto(saveUser);
     return responseDto;
   }
@@ -61,5 +62,18 @@ public class UserService {
   public Long deleteUser(Long userId) {
     userRepository.deleteById(userId);
     return userId;
+  }
+
+  public void login(UserRequestDto requestDto, HttpServletResponse res) {
+    String email = requestDto.getEmail();
+    String pwd = requestDto.getPwd();
+
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new NullPointerException("해당 사용자가 없습니다."));
+    if(!passwordEncoder.matches(pwd,user.getPwd())){
+      throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+    }
+    String token = jwtUtil.createToken(user.getEmail());
+    jwtUtil.addJwtToCookie(token,res);
   }
 }
