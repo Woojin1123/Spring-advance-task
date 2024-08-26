@@ -31,7 +31,7 @@ public class Managed {
   @JoinColumn(name = "schedule_id")
   private Schedule schedule;
 
-  public Managed(Schedule schedule, User user){
+  public Managed(Schedule schedule, User user) {
     this.user = user;
     this.schedule = schedule;
   }

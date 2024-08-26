@@ -17,12 +17,15 @@ public class CommentResponseDto {
   private Long commentId;
 
   public CommentResponseDto(Comment comment) {
-    this.schduleId = comment.getSchedule().getId();
+    this.schduleId = comment.getSchedule()
+        .getId();
     this.regId = comment.getRegId();
     this.name = comment.getName();
     this.contents = comment.getContents();
-    this.createdAt = comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-    this.updatedAt = comment.getUpdatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    this.createdAt = comment.getCreatedAt()
+        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    this.updatedAt = comment.getUpdatedAt()
+        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     this.commentId = comment.getId();
   }
 }

@@ -34,14 +34,13 @@ public class ScheduleService {
 
   @Transactional
   public ScheduleResponseDto createSchedule(ScheduleRequestDto requestDto) {
-    User user = findUser(requestDto);
+    User user = findUser(requestDto.getUserId());
     Schedule schedule = new Schedule(requestDto);
     schedule.setUser(user); //작성자
     Schedule saveSchedule = scheduleRepository.save(schedule);
     if (requestDto.getManagerIds() != null) {
       for (Long managerid : requestDto.getManagerIds()) {
-        User manager = userRepository.findById(managerid)
-            .orElseThrow();
+        User manager = findUser(managerid);
         System.out.println("manager등록");
         if (managedRepository.findByScheduleIdAndUserId(schedule.getId(), manager.getId())
             == null) {
@@ -58,29 +57,30 @@ public class ScheduleService {
   public ScheduleResponseDto findById(Long id) {
     Schedule schedule = scheduleRepository.findById(id)
         .orElseThrow();
-    List<UserResponseDto> userResponseDtos = schedule.getManagedList().stream().map(managed -> {
-      User user = managed.getUser();
-      return new UserResponseDto(user.getId(),user.getName(),user.getEmail());
-    }).toList();
+    List<UserResponseDto> userResponseDtos = schedule.getManagedList()
+        .stream()
+        .map(managed -> {
+          User user = managed.getUser();
+          return new UserResponseDto(user.getId(), user.getName(), user.getEmail());
+        })
+        .toList();
 
-    return new ScheduleResponseDto(schedule,userResponseDtos);
+    return new ScheduleResponseDto(schedule, userResponseDtos);
   }
-
 
   @Transactional
   public ScheduleResponseDto updateSchedule(Long id, ScheduleRequestDto requestDto) {
     Schedule schedule = scheduleRepository.findById(id)
         .orElseThrow();
     schedule.update(requestDto);
-    User user = findUser(requestDto);
+    User user = findUser(requestDto.getUserId());
     schedule.setUser(user);
     Schedule saveSchedule = scheduleRepository.save(schedule);
     ScheduleResponseDto responseDto = new ScheduleResponseDto(saveSchedule);
     managedRepository.deleteAllByScheduleId(schedule.getId());
     if (requestDto.getManagerIds() != null) {
       for (Long managerid : requestDto.getManagerIds()) {
-        User manager = userRepository.findById(managerid)
-            .orElseThrow();
+        User manager = findUser(managerid);
         if (managedRepository.findByScheduleIdAndUserId(schedule.getId(), manager.getId())
             == null) {
           Managed managed = new Managed(schedule, manager);
@@ -108,8 +108,8 @@ public class ScheduleService {
     return id;
   }
 
-  private User findUser(ScheduleRequestDto requestDto) {
-    User user = userRepository.findById(requestDto.getUserId())
+  private User findUser(Long id) {
+    User user = userRepository.findById(id)
         .orElseThrow(() ->
             new NullPointerException("유저가 존재하지 않습니다.")
         );

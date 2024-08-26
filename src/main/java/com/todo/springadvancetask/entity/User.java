@@ -20,7 +20,7 @@ import lombok.Setter;
 @Getter
 @Table(name = "user")
 @NoArgsConstructor
-public class User extends Timestamped{
+public class User extends Timestamped {
 
   @Id
   @Column(name = "user_id")
@@ -33,13 +33,17 @@ public class User extends Timestamped{
   @Setter
   private String email;
 
-  @OneToMany(mappedBy = "user",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @Column(name = "pwd")
+  private String pwd;
+
+  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<Managed> managedList = new ArrayList<>();
 
   public User(UserRequestDto requestDto) {
     this.name = requestDto.getName();
     this.email = requestDto.getEmail();
   }
+
   public void addManagedList(Managed managed) {
     this.managedList.add(managed);
     managed.setUser(this);//연관 관계 설정

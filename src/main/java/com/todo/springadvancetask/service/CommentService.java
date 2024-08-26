@@ -105,7 +105,6 @@ public class CommentService {
         .orElseThrow();
     comment.setContents(requestDto.getContents());
     comment.setName(requestDto.getName());
-    commentRepository.flush();
     CommentResponseDto responseDto = new CommentResponseDto(comment);
     return responseDto;
   }
@@ -127,7 +126,8 @@ public class CommentService {
 
   @Transactional
   public Long deleteById(Long commentId) {
-    Comment comment = commentRepository.findById(commentId).orElseThrow();
+    Comment comment = commentRepository.findById(commentId)
+        .orElseThrow();
     commentRepository.delete(comment);
     return commentId;
   }
