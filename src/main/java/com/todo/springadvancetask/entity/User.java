@@ -33,6 +33,7 @@ public class User extends Timestamped {
   @Setter
   private String email;
 
+  @Setter
   @Column(name = "pwd")
   private String pwd;
 

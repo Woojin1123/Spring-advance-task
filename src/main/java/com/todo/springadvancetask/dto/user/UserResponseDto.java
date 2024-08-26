@@ -15,6 +15,7 @@ public class UserResponseDto {
   private String createdAt;
   private String updatedAt;
 
+
   public UserResponseDto(User saveUser) {
     this.id = saveUser.getId();
     this.name = saveUser.getName();
@@ -30,4 +31,5 @@ public class UserResponseDto {
     this.name = name;
     this.email = email;
   }
+
 }

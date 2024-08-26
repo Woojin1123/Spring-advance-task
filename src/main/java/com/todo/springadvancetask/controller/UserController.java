@@ -3,6 +3,7 @@ package com.todo.springadvancetask.controller;
 import com.todo.springadvancetask.dto.user.UserRequestDto;
 import com.todo.springadvancetask.dto.user.UserResponseDto;
 import com.todo.springadvancetask.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +27,9 @@ public class UserController {
   }
 
   @PostMapping
-  public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto requestDto) {
-    UserResponseDto responseDto = userService.createUser(requestDto);
+  public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto requestDto,
+      HttpServletResponse res) {
+    UserResponseDto responseDto = userService.createUser(requestDto,res);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(responseDto);
   }

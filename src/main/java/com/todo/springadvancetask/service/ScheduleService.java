@@ -42,10 +42,10 @@ public class ScheduleService {
       for (Long managerid : requestDto.getManagerIds()) {
         User manager = findUser(managerid);
         System.out.println("manager등록");
-        if (managedRepository.findByScheduleIdAndUserId(schedule.getId(), manager.getId())
+        if (managedRepository.findByScheduleIdAndUserId(saveSchedule.getId(), manager.getId())
             == null) {
           Managed managed = new Managed(schedule, manager);
-          schedule.addManagedList(managed);
+          saveSchedule.addManagedList(managed);
           managedRepository.save(managed);
         }
       }
@@ -75,8 +75,6 @@ public class ScheduleService {
     schedule.update(requestDto);
     User user = findUser(requestDto.getUserId());
     schedule.setUser(user);
-    Schedule saveSchedule = scheduleRepository.save(schedule);
-    ScheduleResponseDto responseDto = new ScheduleResponseDto(saveSchedule);
     managedRepository.deleteAllByScheduleId(schedule.getId());
     if (requestDto.getManagerIds() != null) {
       for (Long managerid : requestDto.getManagerIds()) {
@@ -89,6 +87,7 @@ public class ScheduleService {
         }
       }
     }
+    ScheduleResponseDto responseDto = new ScheduleResponseDto(schedule);
     return responseDto;
   }
 

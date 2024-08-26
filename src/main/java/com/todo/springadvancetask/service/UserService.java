@@ -1,9 +1,12 @@
 package com.todo.springadvancetask.service;
 
+import com.todo.springadvancetask.config.PasswordEncoder;
 import com.todo.springadvancetask.dto.user.UserRequestDto;
 import com.todo.springadvancetask.dto.user.UserResponseDto;
 import com.todo.springadvancetask.entity.User;
 import com.todo.springadvancetask.repository.UserRepository;
+import com.todo.springadvancetask.util.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,15 +15,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
   private final UserRepository userRepository;
-
-  public UserService(UserRepository userRepository) {
+  private final PasswordEncoder passwordEncoder;
+  private final JwtUtil jwtUtil;
+  public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+      JwtUtil jwtUtil) {
     this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
+    this.jwtUtil = jwtUtil;
   }
 
   @Transactional
-  public UserResponseDto createUser(UserRequestDto requestDto) {
+  public UserResponseDto createUser(UserRequestDto requestDto, HttpServletResponse res) {
     User user = new User(requestDto);
+    user.setPwd(passwordEncoder.encode(requestDto.getPwd()));
     User saveUser = userRepository.save(user);
+    String token = jwtUtil.createToken(saveUser.getEmail());
+    jwtUtil.addJwtToCookie(token,res);
     UserResponseDto responseDto = new UserResponseDto(saveUser);
     return responseDto;
   }

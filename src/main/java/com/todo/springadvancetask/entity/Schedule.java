@@ -37,7 +37,7 @@ public class Schedule extends Timestamped {
   @NonNull
   @Column(name = "contents", nullable = false, length = 200)
   String contents;
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @Setter
   @JoinColumn(name = "writer")
   private User user;
