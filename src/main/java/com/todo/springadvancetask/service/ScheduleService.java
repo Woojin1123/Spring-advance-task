@@ -2,14 +2,13 @@ package com.todo.springadvancetask.service;
 
 import com.todo.springadvancetask.dto.schedule.ScheduleRequestDto;
 import com.todo.springadvancetask.dto.schedule.ScheduleResponseDto;
+import com.todo.springadvancetask.entity.Managed;
 import com.todo.springadvancetask.entity.Schedule;
 import com.todo.springadvancetask.entity.User;
-import com.todo.springadvancetask.entity.Managed;
+import com.todo.springadvancetask.repository.ManagedRepository;
 import com.todo.springadvancetask.repository.ScheduleRepository;
 import com.todo.springadvancetask.repository.UserRepository;
-import com.todo.springadvancetask.repository.ManagedRepository;
 import java.util.List;
-import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,10 +41,13 @@ public class ScheduleService {
       for (Long managerid : requestDto.getManagerIds()) {
         User manager = userRepository.findById(managerid)
             .orElseThrow();
-        Managed managed = new Managed();
-        managed.setUser(manager);
-        managed.setSchedule(schedule);
-        managedRepository.save(managed);
+        System.out.println("manager등록");
+        if (managedRepository.findByScheduleIdAndUserId(schedule.getId(), manager.getId())
+            == null) {
+          Managed managed = new Managed(schedule, manager);
+          schedule.addManagedList(managed);
+          managedRepository.save(managed);
+        }
       }
     }
     return new ScheduleResponseDto(saveSchedule);
@@ -55,7 +57,7 @@ public class ScheduleService {
   public ScheduleResponseDto findById(Long id) {
     Schedule schedule = scheduleRepository.findById(id)
         .orElseThrow();
-    Set<Managed> managedList = schedule.getManagedList();
+    List<Managed> managedList = schedule.getManagedList();
     return new ScheduleResponseDto(schedule);
   }
 
@@ -69,14 +71,17 @@ public class ScheduleService {
     schedule.setUser(user);
     Schedule saveSchedule = scheduleRepository.save(schedule);
     ScheduleResponseDto responseDto = new ScheduleResponseDto(saveSchedule);
+    managedRepository.deleteAllByScheduleId(schedule.getId());
     if (requestDto.getManagerIds() != null) {
       for (Long managerid : requestDto.getManagerIds()) {
         User manager = userRepository.findById(managerid)
             .orElseThrow();
-        Managed managed = new Managed();
-        managed.setUser(manager);
-        managed.setSchedule(schedule);
-        managedRepository.save(managed);
+        if (managedRepository.findByScheduleIdAndUserId(schedule.getId(), manager.getId())
+            == null) {
+          Managed managed = new Managed(schedule, manager);
+          schedule.addManagedList(managed);
+          managedRepository.save(managed);
+        }
       }
     }
     return responseDto;

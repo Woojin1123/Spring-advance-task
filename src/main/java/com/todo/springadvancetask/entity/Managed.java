@@ -8,11 +8,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Table(name = "managed")
+@NoArgsConstructor
 public class Managed {
 
   @Id
@@ -29,4 +31,8 @@ public class Managed {
   @JoinColumn(name = "schedule_id")
   private Schedule schedule;
 
+  public Managed(Schedule schedule, User user){
+    this.user = user;
+    this.schedule = schedule;
+  }
 }
