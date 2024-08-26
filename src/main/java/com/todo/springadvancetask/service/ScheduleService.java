@@ -2,6 +2,7 @@ package com.todo.springadvancetask.service;
 
 import com.todo.springadvancetask.dto.schedule.ScheduleRequestDto;
 import com.todo.springadvancetask.dto.schedule.ScheduleResponseDto;
+import com.todo.springadvancetask.dto.user.UserResponseDto;
 import com.todo.springadvancetask.entity.Managed;
 import com.todo.springadvancetask.entity.Schedule;
 import com.todo.springadvancetask.entity.User;
@@ -57,8 +58,12 @@ public class ScheduleService {
   public ScheduleResponseDto findById(Long id) {
     Schedule schedule = scheduleRepository.findById(id)
         .orElseThrow();
-    List<Managed> managedList = schedule.getManagedList();
-    return new ScheduleResponseDto(schedule);
+    List<UserResponseDto> userResponseDtos = schedule.getManagedList().stream().map(managed -> {
+      User user = managed.getUser();
+      return new UserResponseDto(user.getId(),user.getName(),user.getEmail());
+    }).toList();
+
+    return new ScheduleResponseDto(schedule,userResponseDtos);
   }
 
 

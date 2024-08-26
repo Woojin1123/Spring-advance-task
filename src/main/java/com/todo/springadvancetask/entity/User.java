@@ -1,8 +1,10 @@
 package com.todo.springadvancetask.entity;
 
 import com.todo.springadvancetask.dto.user.UserRequestDto;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -31,7 +33,7 @@ public class User extends Timestamped{
   @Setter
   private String email;
 
-  @OneToMany(mappedBy = "user")
+  @OneToMany(mappedBy = "user",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<Managed> managedList = new ArrayList<>();
 
   public User(UserRequestDto requestDto) {

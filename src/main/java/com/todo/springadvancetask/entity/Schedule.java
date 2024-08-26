@@ -4,6 +4,7 @@ import com.todo.springadvancetask.dto.schedule.ScheduleRequestDto;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -40,10 +41,10 @@ public class Schedule extends Timestamped {
   @Setter
   @JoinColumn(name = "writer")
   private User user;
-  @OneToMany(mappedBy = "schedule", cascade = CascadeType.REMOVE)
+  @OneToMany(mappedBy = "schedule", cascade = CascadeType.REMOVE,orphanRemoval = true)
   private List<Comment> commentList = new ArrayList<>();
 
-  @OneToMany(mappedBy = "schedule", cascade = CascadeType.REMOVE)
+  @OneToMany(mappedBy = "schedule",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE,orphanRemoval = true)
   private List<Managed> managedList = new ArrayList<>();
 
   public Schedule(ScheduleRequestDto requestDto) {
