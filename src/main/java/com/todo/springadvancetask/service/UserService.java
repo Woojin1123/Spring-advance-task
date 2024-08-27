@@ -36,8 +36,7 @@ public class UserService {
     res.addHeader("Authorization", token);
 //    jwtUtil.addJwtToCookie(token,res);
 //    쿠키활용
-    UserResponseDto responseDto = new UserResponseDto(saveUser);
-    return responseDto;
+    return new UserResponseDto(saveUser);
   }
 
   public UserResponseDto findById(Long userId) {
@@ -49,7 +48,7 @@ public class UserService {
   public List<UserResponseDto> findAll() {
     List<User> users = userRepository.findAll();
     return users.stream()
-        .map(user -> new UserResponseDto(user))
+        .map(UserResponseDto::new)
         .toList();
   }
 

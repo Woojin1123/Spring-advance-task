@@ -25,21 +25,16 @@ public class CommentService {
 
   @Transactional
   public CommentResponseDto createComments(Long scheduleId, CommentRequestDto requestDto) {
-
     Schedule schedule = scheduleRepository.findById(scheduleId)
         .orElseThrow();
-
     Comment comment = new Comment(requestDto);
     Long regId = commentRepository.findRegId(scheduleId);
     comment.setRegId(regId); // 일정에 따라 댓글 번호 설정
-
     comment.setSchedule(schedule); // 연관 관계 설정
     schedule.addCommentList(comment);
-
-    scheduleRepository.save(schedule);
     Comment saveComment = commentRepository.save(comment);
-    CommentResponseDto responseDto = new CommentResponseDto(saveComment);
-    return responseDto;
+
+    return new CommentResponseDto(saveComment);
   }
 
   public List<CommentResponseDto> findAllBySchedule(Long scheduleId) {
@@ -59,7 +54,7 @@ public class CommentService {
     Schedule schedule = scheduleRepository.findById(scheduleId)
         .orElseThrow();
     for (Comment comment : schedule.getCommentList()) {
-      if (regId == comment.getRegId()) {
+      if (regId.equals(comment.getRegId())) {
         return new CommentResponseDto(comment);
       }
     }
@@ -89,10 +84,9 @@ public class CommentService {
         .orElseThrow();
     List<Comment> commentList = schedule.getCommentList();
     for (Comment comment : commentList) {
-      if (comment.getRegId() == regId) {
+      if (comment.getRegId().equals(regId)) {
         comment.setName(requestDto.getName());
         comment.setContents(requestDto.getContents());
-        commentRepository.flush();
         return new CommentResponseDto(comment);
       }
     }
@@ -105,8 +99,7 @@ public class CommentService {
         .orElseThrow();
     comment.setContents(requestDto.getContents());
     comment.setName(requestDto.getName());
-    CommentResponseDto responseDto = new CommentResponseDto(comment);
-    return responseDto;
+    return new CommentResponseDto(comment);
   }
 
   @Transactional
@@ -115,7 +108,7 @@ public class CommentService {
         .orElseThrow();
     List<Comment> commentList = schedule.getCommentList();
     for (Comment comment : commentList) {
-      if (comment.getRegId() == regId) {
+      if (comment.getRegId().equals(regId)) {
         commentList.remove(comment);
         commentRepository.delete(comment);
         return regId;

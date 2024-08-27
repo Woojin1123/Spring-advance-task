@@ -82,8 +82,7 @@ public class ScheduleService {
         schedule.addManagedList(managed);
       }
     }
-    ScheduleResponseDto responseDto = new ScheduleResponseDto(schedule);
-    return responseDto;
+    return new ScheduleResponseDto(schedule);
   }
 
   @Transactional(readOnly = true)
@@ -93,7 +92,7 @@ public class ScheduleService {
     Page<Schedule> page = scheduleRepository.findAll(pageable);
     return page.getContent()
         .stream()
-        .map(schedule -> new ScheduleResponseDto(schedule))
+        .map(ScheduleResponseDto::new)
         .toList();
   }
 
@@ -103,11 +102,10 @@ public class ScheduleService {
   }
 
   private User findUser(Long id) {
-    User user = userRepository.findById(id)
+    return userRepository.findById(id)
         .orElseThrow(() ->
             new NullPointerException("유저가 존재하지 않습니다.")
         );
-    return user;
   }
 
 }
