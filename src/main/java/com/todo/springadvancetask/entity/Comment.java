@@ -30,7 +30,7 @@ public class Comment extends Timestamped {
   @Column(name = "contents", nullable = false, length = 100)
   String contents;
   @Setter
-  @Column(name = "user_name", nullable = false)
+  @Column(name = "user_name", nullable = false,length = 50)
   String name;
 
   @Setter

@@ -3,6 +3,7 @@ package com.todo.springadvancetask.controller;
 import com.todo.springadvancetask.dto.comment.CommentRequestDto;
 import com.todo.springadvancetask.dto.comment.CommentResponseDto;
 import com.todo.springadvancetask.service.CommentService;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class CommentController {
 
   @PostMapping("/{scheduleId}/comments") //등록
   public ResponseEntity<CommentResponseDto> createComments(@PathVariable Long scheduleId,
-      @RequestBody
+      @Valid @RequestBody
       CommentRequestDto requestDto) {
 
     CommentResponseDto responseDto = commentService.createComments(scheduleId, requestDto);

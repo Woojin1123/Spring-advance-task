@@ -3,6 +3,7 @@ package com.todo.springadvancetask.controller;
 import com.todo.springadvancetask.dto.schedule.ScheduleRequestDto;
 import com.todo.springadvancetask.dto.schedule.ScheduleResponseDto;
 import com.todo.springadvancetask.service.ScheduleService;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,7 @@ public class ScheduleController {
   }
 
   @PostMapping
-  public ResponseEntity createSchedule(@RequestBody ScheduleRequestDto requestDto) {
+  public ResponseEntity createSchedule(@Valid @RequestBody ScheduleRequestDto requestDto) {
     ScheduleResponseDto responseDto = scheduleService.createSchedule(requestDto);
     return ResponseEntity.status(HttpStatus.OK)
         .body(responseDto);

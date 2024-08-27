@@ -13,6 +13,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.Key;
 import java.util.Base64;
@@ -52,12 +53,13 @@ public class JwtUtil {
   }
 
   // 토큰 생성
-  public String createToken(String email) {
+  public String createToken(String email, String role) {
     Date date = new Date();
 
     return BEARER_PREFIX +
         Jwts.builder()
             .setSubject(email) // 사용자 식별자값(ID)
+            .claim("role", role)
             .setExpiration(new Date(date.getTime() + TOKEN_TIME)) // 만료 시간
             .setIssuedAt(date) // 발급일
             .signWith(key, signatureAlgorithm) // 암호화 알고리즘
@@ -68,6 +70,22 @@ public class JwtUtil {
     String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
     if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
       return bearerToken.substring(7);
+    }
+    return null;
+  }
+
+  public String getJwtFromCookie(HttpServletRequest request) throws UnsupportedEncodingException {
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (Cookie c : cookies) {
+        String name = c.getName();
+        String value = c.getValue();
+        if (name.equals(AUTHORIZATION_HEADER)) {
+          value = URLDecoder.decode(value, "utf-8")
+              .replaceAll("%20", "\\+"); // decode
+          return value.substring(7);
+        }
+      }
     }
     return null;
   }
@@ -115,7 +133,7 @@ public class JwtUtil {
   }
 
   public String subStringToken(String tokenvalue) {
-    if(StringUtils.hasText(tokenvalue) && tokenvalue.startsWith(BEARER_PREFIX)){
+    if (StringUtils.hasText(tokenvalue) && tokenvalue.startsWith(BEARER_PREFIX)) {
       return tokenvalue.substring(7);
     }
     throw new NullPointerException("토큰이 존재하지 않습니다.");
