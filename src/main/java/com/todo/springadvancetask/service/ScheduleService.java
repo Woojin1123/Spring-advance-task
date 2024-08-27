@@ -39,14 +39,12 @@ public class ScheduleService {
     schedule.setUser(user); //작성자
     Schedule saveSchedule = scheduleRepository.save(schedule);
     if (requestDto.getManagerIds() != null) {
-      for (Long managerid : requestDto.getManagerIds()) {
-        User manager = findUser(managerid);
-        System.out.println("manager등록");
-        if (managedRepository.findByScheduleIdAndUserId(saveSchedule.getId(), manager.getId())
+      for (Long managerId : requestDto.getManagerIds()) {
+        if (managedRepository.findByScheduleIdAndUserId(saveSchedule.getId(), managerId)
             == null) {
+          User manager = findUser(managerId);
           Managed managed = new Managed(schedule, manager);
           saveSchedule.addManagedList(managed);
-          managedRepository.save(managed);
         }
       }
     }
@@ -72,19 +70,16 @@ public class ScheduleService {
   public ScheduleResponseDto updateSchedule(Long id, ScheduleRequestDto requestDto) {
     Schedule schedule = scheduleRepository.findById(id)
         .orElseThrow();
-    schedule.update(requestDto);
     User user = findUser(requestDto.getUserId());
-    schedule.setUser(user);
-    managedRepository.deleteAllByScheduleId(schedule.getId());
+    schedule.update(requestDto, user); // 내용, 제목, 작성자 업데이트
+
     if (requestDto.getManagerIds() != null) {
-      for (Long managerid : requestDto.getManagerIds()) {
-        User manager = findUser(managerid);
-        if (managedRepository.findByScheduleIdAndUserId(schedule.getId(), manager.getId())
-            == null) {
-          Managed managed = new Managed(schedule, manager);
-          schedule.addManagedList(managed);
-          managedRepository.save(managed);
-        }
+      schedule.getManagedList()
+          .clear();
+      for (Long managerId : requestDto.getManagerIds()) {
+        User manager = findUser(managerId);
+        Managed managed = new Managed(schedule, manager);
+        schedule.addManagedList(managed);
       }
     }
     ScheduleResponseDto responseDto = new ScheduleResponseDto(schedule);

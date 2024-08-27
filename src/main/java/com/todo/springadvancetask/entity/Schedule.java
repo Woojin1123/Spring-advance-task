@@ -41,10 +41,10 @@ public class Schedule extends Timestamped {
   @Setter
   @JoinColumn(name = "writer")
   private User user;
-  @OneToMany(mappedBy = "schedule", cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Comment> commentList = new ArrayList<>();
 
-  @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Managed> managedList = new ArrayList<>();
 
   public Schedule(ScheduleRequestDto requestDto) {
@@ -52,9 +52,10 @@ public class Schedule extends Timestamped {
     this.title = requestDto.getTitle();
   }
 
-  public void update(ScheduleRequestDto requestDto) {
+  public void update(ScheduleRequestDto requestDto, User user) {
     this.contents = requestDto.getContents();
     this.title = requestDto.getTitle();
+    this.user = user;
   }
 
   public void addCommentList(Comment comment) {

@@ -37,7 +37,7 @@ public class User extends Timestamped {
   @Column(name = "pwd")
   private String pwd;
 
-  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Managed> managedList = new ArrayList<>();
 
   public User(UserRequestDto requestDto) {
