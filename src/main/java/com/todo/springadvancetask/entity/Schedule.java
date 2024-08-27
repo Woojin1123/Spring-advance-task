@@ -37,15 +37,19 @@ public class Schedule extends Timestamped {
   @NonNull
   @Column(name = "contents", nullable = false, length = 200)
   String contents;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @Setter
   @JoinColumn(name = "writer")
   private User user;
   @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Comment> commentList = new ArrayList<>();
-
   @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Managed> managedList = new ArrayList<>();
+
+  @Setter
+  @Column(name = "weather")
+  private String weather;
 
   public Schedule(ScheduleRequestDto requestDto) {
     this.contents = requestDto.getContents();

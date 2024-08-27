@@ -19,6 +19,7 @@ public class ScheduleResponseDto {
   private String createdAt;
   private String updatedAt;
   private int commentCnt;
+  private String weather;
   @Setter
   private List<UserResponseDto> managers;
 
@@ -35,6 +36,7 @@ public class ScheduleResponseDto {
         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     this.commentCnt = schedule.getCommentList()
         .size();
+    this.weather = schedule.getWeather();
   }
 
   public ScheduleResponseDto(Schedule schedule, List<UserResponseDto> userResponseDtos) {
