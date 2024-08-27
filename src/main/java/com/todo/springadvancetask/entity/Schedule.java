@@ -44,7 +44,7 @@ public class Schedule extends Timestamped {
   private User user;
   @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Comment> commentList = new ArrayList<>();
-  @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Managed> managedList = new ArrayList<>();
 
   @Setter
@@ -69,6 +69,9 @@ public class Schedule extends Timestamped {
 
   public void addManagedList(Managed managed) {
     this.managedList.add(managed);
+    managed.getUser()
+        .getManagedList()
+        .clear();
     managed.getUser()
         .addManagedList(managed);
   }

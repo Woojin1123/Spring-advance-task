@@ -109,8 +109,7 @@ public class CommentService {
     List<Comment> commentList = schedule.getCommentList();
     for (Comment comment : commentList) {
       if (comment.getRegId().equals(regId)) {
-        commentList.remove(comment);
-        commentRepository.delete(comment);
+        schedule.getCommentList().remove(comment);
         return regId;
       }
     }

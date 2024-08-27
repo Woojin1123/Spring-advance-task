@@ -12,6 +12,7 @@ import com.todo.springadvancetask.repository.UserRepository;
 import com.todo.springadvancetask.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,7 +72,6 @@ public class UserService {
         .orElseThrow();
     user.setName(requestDto.getName());
     user.setEmail(requestDto.getEmail());
-
     return new UserResponseDto(user);
   }
 
@@ -91,5 +91,9 @@ public class UserService {
     String token = jwtUtil.createToken(user.getEmail(), user.getRole());
     res.addHeader("Authorization", token);
     jwtUtil.addJwtToCookie(token, res);
+  }
+
+  public Optional<User> findUserByEmail(String subject) {
+    return userRepository.findByEmail(subject);
   }
 }

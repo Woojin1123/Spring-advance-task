@@ -49,19 +49,16 @@ public class ScheduleService {
     User user = findUser(requestDto.getUserId());
     Schedule schedule = new Schedule(requestDto);
     schedule.setUser(user); //작성자
-    Schedule saveSchedule = scheduleRepository.save(schedule);
-    String weather = getWeather(saveSchedule.getCreatedAt());
-    saveSchedule.setWeather(weather);
+    String weather = getWeather();
+    schedule.setWeather(weather);
     if (requestDto.getManagerIds() != null) {
       for (Long managerId : requestDto.getManagerIds()) {
-        if (managedRepository.findByScheduleIdAndUserId(saveSchedule.getId(), managerId)
-            == null) {
           User manager = findUser(managerId);
           Managed managed = new Managed(schedule, manager);
-          saveSchedule.addManagedList(managed);
+          schedule.addManagedList(managed);
         }
       }
-    }
+    Schedule saveSchedule = scheduleRepository.save(schedule);
     return new ScheduleResponseDto(saveSchedule);
   }
 
@@ -76,18 +73,16 @@ public class ScheduleService {
           return new UserResponseDto(user.getId(), user.getName(), user.getEmail());
         })
         .toList();
-
     return new ScheduleResponseDto(schedule, userResponseDtos);
   }
 
   @Transactional
   public ScheduleResponseDto updateSchedule(Long id, ScheduleRequestDto requestDto) {
     Schedule schedule = scheduleRepository.findById(id)
-        .orElseThrow();
-    User user = findUser(requestDto.getUserId());
-    schedule.update(requestDto, user); // 내용, 제목, 작성자 업데이트
-
-    if (requestDto.getManagerIds() != null) {
+        .orElseThrow(); //일정 찾아오기
+    User newUser = findUser(requestDto.getUserId()); //바뀔 유저 Id 찾아오기
+    schedule.update(requestDto, newUser); // 내용, 제목, 작성자 업데이트
+    if (requestDto.getManagerIds() != null) { //매니저 변경 요청이 있을 경우
       schedule.getManagedList()
           .clear();
       for (Long managerId : requestDto.getManagerIds()) {
@@ -96,7 +91,8 @@ public class ScheduleService {
         schedule.addManagedList(managed);
       }
     }
-    return new ScheduleResponseDto(schedule);
+    Schedule saveSchedule = scheduleRepository.save(schedule);
+    return new ScheduleResponseDto(saveSchedule);
   }
 
   @Transactional(readOnly = true)
@@ -122,8 +118,9 @@ public class ScheduleService {
         );
   }
 
-  private String getWeather(LocalDateTime createdAt) {
-    String createDate = createdAt.format(DateTimeFormatter.ofPattern("MM-dd"));
+  private String getWeather() {
+    String createDate = LocalDateTime.now()
+        .format(DateTimeFormatter.ofPattern("MM-dd"));
     URI uri = UriComponentsBuilder
         .fromUriString("https://f-api.github.io")
         .path("/f-api/weather.json")

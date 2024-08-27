@@ -4,7 +4,6 @@ import com.todo.springadvancetask.dto.user.UserRequestDto;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -41,7 +40,7 @@ public class User extends Timestamped {
   @Column(name = "role")
   private String role;
 
-  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Managed> managedList = new ArrayList<>();
 
   public User(UserRequestDto requestDto) {
@@ -50,7 +49,6 @@ public class User extends Timestamped {
   }
 
   public void addManagedList(Managed managed) {
-    this.managedList.add(managed);
-    managed.setUser(this);//연관 관계 설정
+    this.managedList.add(managed);//연관 관계 설정
   }
 }

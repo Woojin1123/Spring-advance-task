@@ -28,13 +28,13 @@ public class ScheduleController {
   }
 
   @GetMapping("/{id}") //단건조회
-  public ResponseEntity getScheduleById(@PathVariable Long id) {
+  public ResponseEntity<ScheduleResponseDto> getScheduleById(@PathVariable Long id) {
     return ResponseEntity.status(HttpStatus.OK)
         .body(scheduleService.findById(id));
   }
 
   @GetMapping // 전체조회
-  public ResponseEntity getAllSchedules(
+  public ResponseEntity<List<ScheduleResponseDto>> getAllSchedules(
       @RequestParam(name = "page_no", defaultValue = "0") int pageNo,
       @RequestParam(name = "page_size", defaultValue = "10") int pageSize) {
     List<ScheduleResponseDto> responseDtos = scheduleService.getAllSchedules(pageNo, pageSize);
@@ -43,14 +43,14 @@ public class ScheduleController {
   }
 
   @PostMapping
-  public ResponseEntity createSchedule(@Valid @RequestBody ScheduleRequestDto requestDto) {
+  public ResponseEntity<ScheduleResponseDto> createSchedule(@Valid @RequestBody ScheduleRequestDto requestDto) {
     ScheduleResponseDto responseDto = scheduleService.createSchedule(requestDto);
     return ResponseEntity.status(HttpStatus.OK)
         .body(responseDto);
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity updateSchedule(@PathVariable Long id,
+  public ResponseEntity<ScheduleResponseDto> updateSchedule(@PathVariable Long id,
       @RequestBody ScheduleRequestDto requestDto) {
     ScheduleResponseDto responseDto = scheduleService.updateSchedule(id, requestDto);
     return ResponseEntity.status(HttpStatus.OK)
@@ -58,7 +58,7 @@ public class ScheduleController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity deleteSchedule(@PathVariable Long id) {
+  public ResponseEntity<Long> deleteSchedule(@PathVariable Long id) {
     Long deletedId = scheduleService.deleteSchedule(id);
     return ResponseEntity.status(HttpStatus.ACCEPTED)
         .body(deletedId);
