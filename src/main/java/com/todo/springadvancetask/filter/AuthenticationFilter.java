@@ -1,7 +1,7 @@
 package com.todo.springadvancetask.filter;
 
 import com.todo.springadvancetask.entity.User;
-import com.todo.springadvancetask.repository.UserRepository;
+import com.todo.springadvancetask.service.UserService;
 import com.todo.springadvancetask.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -24,11 +24,12 @@ import org.springframework.util.StringUtils;
 public class AuthenticationFilter implements Filter {
 
   private final JwtUtil jwtUtil;
-  private final UserRepository userRepository;
+  private final UserService userService;
 
-  public AuthenticationFilter(JwtUtil jwtUtil, UserRepository userRepository) {
+  public AuthenticationFilter(JwtUtil jwtUtil, UserService userService) {
     this.jwtUtil = jwtUtil;
-    this.userRepository = userRepository;
+    this.userService = userService;
+
   }
 
   @Override
@@ -39,16 +40,19 @@ public class AuthenticationFilter implements Filter {
 
     if (StringUtils.hasText(url) && (url.equals("/api/users") || url.equals("/api/users/login"))) {
       chain.doFilter(request, response); // 로그인 & 유저등록은 제외
+      return;
     } else {
       try { //유저 인증
         String token = jwtUtil.getJwtFromCookie(servletRequest);
-          if (StringUtils.hasText(token)) {
+        if (StringUtils.hasText(token)) {
+          jwtUtil.validateToken(token);
           Claims info = jwtUtil.getUserInfoFromToken(token);
-          User user = userRepository.findByEmail(info.getSubject())
+          User user = userService.findUserByEmail(info.getSubject())
               .orElseThrow(() -> new NullPointerException("유저가 존재하지 않습니다."));
           request.setAttribute("user", user);
           request.setAttribute("role", info.get("role"));
           chain.doFilter(request, response);
+          return;
         } else {
           HttpServletResponse res = (HttpServletResponse) response;
           res.setStatus(400);

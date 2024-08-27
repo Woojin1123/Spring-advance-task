@@ -14,6 +14,7 @@ public class UserResponseDto {
   private String email;
   private String createdAt;
   private String updatedAt;
+  private String role;
 
 
   public UserResponseDto(User saveUser) {
@@ -24,6 +25,7 @@ public class UserResponseDto {
         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     this.updatedAt = saveUser.getUpdatedAt()
         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    this.role = saveUser.getRole();
   }
 
   public UserResponseDto(Long id, String name, String email) {

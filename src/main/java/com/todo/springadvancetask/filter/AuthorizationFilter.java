@@ -30,12 +30,14 @@ public class AuthorizationFilter implements Filter {
     String method = servletRequest.getMethod();
     if (StringUtils.hasText(url) && (url.equals("/api/users") || url.equals("/api/users/login"))) {
       chain.doFilter(request, response); // 로그인 & 유저등록은 제외
+      return;
     }
     if (isAdminUrl(url,method)){
       User user = (User)servletRequest.getAttribute("user");
       String role = (String) servletRequest.getAttribute("role");
       if(user.getRole().equals(UserRoleEnum.ADMIN.getAuthority()) && role.equals(UserRoleEnum.ADMIN.getAuthority())) {
         chain.doFilter(request, response);
+        return;
       }else{
         HttpServletResponse res = (HttpServletResponse) response;
         res.setStatus(403);
@@ -45,6 +47,7 @@ public class AuthorizationFilter implements Filter {
       }
     }else{
       chain.doFilter(request,response);
+      return;
     }
   }
   private boolean isAdminUrl(String url,String method){
