@@ -18,15 +18,15 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-@Slf4j(topic = "AuthFilter")
+@Slf4j(topic = "Authentication")
 @Component
 @Order(1)
-public class AuthFilter implements Filter {
+public class AuthenticationFilter implements Filter {
 
   private final JwtUtil jwtUtil;
   private final UserRepository userRepository;
 
-  public AuthFilter(JwtUtil jwtUtil, UserRepository userRepository) {
+  public AuthenticationFilter(JwtUtil jwtUtil, UserRepository userRepository) {
     this.jwtUtil = jwtUtil;
     this.userRepository = userRepository;
   }
@@ -38,20 +38,16 @@ public class AuthFilter implements Filter {
     String url = servletRequest.getRequestURI();
 
     if (StringUtils.hasText(url) && (url.equals("/api/users") || url.equals("/api/users/login"))) {
-      chain.doFilter(request, response);
+      chain.doFilter(request, response); // 로그인 & 유저등록은 제외
     } else {
-      try {
-        String tokenvalue = jwtUtil.getJwtFromHeader(servletRequest);
-        if (StringUtils.hasText(tokenvalue)) {
-          String token = tokenvalue;
-
+      try { //유저 인증
+        String token = jwtUtil.getJwtFromCookie(servletRequest);
+          if (StringUtils.hasText(token)) {
           Claims info = jwtUtil.getUserInfoFromToken(token);
           User user = userRepository.findByEmail(info.getSubject())
-              .orElseThrow(
-                  () -> new NullPointerException("유저가 존재하지 않습니다.") // exception따로 구현
-              );
-
+              .orElseThrow(() -> new NullPointerException("유저가 존재하지 않습니다."));
           request.setAttribute("user", user);
+          request.setAttribute("role", info.get("role"));
           chain.doFilter(request, response);
         } else {
           HttpServletResponse res = (HttpServletResponse) response;
@@ -60,12 +56,18 @@ public class AuthFilter implements Filter {
           res.getWriter()
               .write("토큰이 존재하지 않습니다.");
         }
-      }catch (ExpiredJwtException e){
+      } catch (ExpiredJwtException e) {
         HttpServletResponse res = (HttpServletResponse) response;
         res.setStatus(401);
         res.setCharacterEncoding("utf-8");
         res.getWriter()
             .write("토큰이 만료되었습니다.");
+      } catch (NullPointerException e) {
+        HttpServletResponse res = (HttpServletResponse) response;
+        res.setStatus(404);
+        res.setCharacterEncoding("utf-8");
+        res.getWriter()
+            .write(e.getMessage());
       }
     }
   }
