@@ -4,8 +4,10 @@ import com.todo.springadvancetask.config.PasswordEncoder;
 import com.todo.springadvancetask.dto.user.UserRequestDto;
 import com.todo.springadvancetask.dto.user.UserResponseDto;
 import com.todo.springadvancetask.entity.User;
+import com.todo.springadvancetask.entity.UserRoleEnum;
+import com.todo.springadvancetask.exception.custom.AlreadyExistException;
 import com.todo.springadvancetask.exception.ErrorCode;
-import com.todo.springadvancetask.exception.custom.AuthorizationException;
+import com.todo.springadvancetask.exception.custom.AuthenticationException;
 import com.todo.springadvancetask.repository.UserRepository;
 import com.todo.springadvancetask.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,13 +31,24 @@ public class UserService {
 
   @Transactional
   public UserResponseDto createUser(UserRequestDto requestDto, HttpServletResponse res) {
+    userRepository.findByEmail(requestDto.getEmail())
+        .ifPresent(a -> {
+          throw new AlreadyExistException(ErrorCode.USER_ALREADY_EXIST);
+        }); //중복 검사
     User user = new User(requestDto);
     user.setPwd(passwordEncoder.encode(requestDto.getPwd()));
+    if (userRepository.findAll()
+        .isEmpty()) {
+      user.setRole(UserRoleEnum.ADMIN.getAuthority());
+    } else {
+      user.setRole(UserRoleEnum.USER.getAuthority());
+    }
+
     User saveUser = userRepository.save(user);
-    String token = jwtUtil.createToken(user.getEmail());
+    String token = jwtUtil.createToken(user.getEmail(), user.getRole());
     res.addHeader("Authorization", token);
-//    jwtUtil.addJwtToCookie(token,res);
-//    쿠키활용
+    jwtUtil.addJwtToCookie(token, res);
+
     return new UserResponseDto(saveUser);
   }
 
@@ -73,11 +86,10 @@ public class UserService {
     User user = userRepository.findByEmail(email)
         .orElseThrow(() -> new NullPointerException("해당 사용자가 없습니다."));
     if (!passwordEncoder.matches(pwd, user.getPwd())) {
-      throw new AuthorizationException(ErrorCode.LOGIN_FAILED);
+      throw new AuthenticationException(ErrorCode.LOGIN_FAILED);
     }
-    String token = jwtUtil.createToken(user.getEmail());
+    String token = jwtUtil.createToken(user.getEmail(), user.getRole());
     res.addHeader("Authorization", token);
-//    jwtUtil.addJwtToCookie(token,res);
-    // 쿠키 활용
+    jwtUtil.addJwtToCookie(token, res);
   }
 }
