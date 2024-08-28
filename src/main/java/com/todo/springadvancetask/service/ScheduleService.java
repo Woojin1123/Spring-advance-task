@@ -7,13 +7,19 @@ import com.todo.springadvancetask.dto.user.UserResponseDto;
 import com.todo.springadvancetask.entity.Managed;
 import com.todo.springadvancetask.entity.Schedule;
 import com.todo.springadvancetask.entity.User;
+import com.todo.springadvancetask.exception.ErrorCode;
+import com.todo.springadvancetask.exception.custom.AuthorizationException;
 import com.todo.springadvancetask.repository.ManagedRepository;
 import com.todo.springadvancetask.repository.ScheduleRepository;
 import com.todo.springadvancetask.repository.UserRepository;
+import com.todo.springadvancetask.util.JwtUtil;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import lombok.SneakyThrows;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
@@ -32,39 +38,43 @@ public class ScheduleService {
 
   private final ScheduleRepository scheduleRepository;
   private final UserRepository userRepository;
-  private final ManagedRepository managedRepository;
+  private final JwtUtil jwtUtil;
   private final RestTemplate restTemplate;
+  private final ManagedRepository managedRepository;
 
   public ScheduleService(ScheduleRepository scheduleRepository,
-      UserRepository userRepository, ManagedRepository managedRepository,
-      RestTemplateBuilder builder) {
+      UserRepository userRepository,
+      JwtUtil jwtUtil, RestTemplateBuilder builder, ManagedRepository managedRepository) {
     this.scheduleRepository = scheduleRepository;
     this.userRepository = userRepository;
-    this.managedRepository = managedRepository;
+    this.jwtUtil = jwtUtil;
     this.restTemplate = builder.build();
+    this.managedRepository = managedRepository;
   }
 
   @Transactional
-  public ScheduleResponseDto createSchedule(ScheduleRequestDto requestDto) {
-    User user = findUser(requestDto.getUserId());
+  public ScheduleResponseDto createSchedule(ScheduleRequestDto requestDto, HttpServletRequest req) {
+    User user = findUserFromCookie(req);
     Schedule schedule = new Schedule(requestDto);
     schedule.addUser(user); //작성자
     String weather = getWeather();
     schedule.setWeather(weather);
     if (requestDto.getManagerIds() != null) {
       for (Long managerId : requestDto.getManagerIds()) {
-          User manager = findUser(managerId);
-          Managed managed = new Managed(schedule, manager);
-          schedule.addManagedList(managed);
-        }
+        User manager = findUser(managerId);
+        Managed managed = new Managed(schedule, manager);
+        schedule.addManagedList(managed);
       }
+    }
     Schedule saveSchedule = scheduleRepository.save(schedule);
     return new ScheduleResponseDto(saveSchedule);
   }
 
   public ScheduleResponseDto findById(Long id) {
     Schedule schedule = scheduleRepository.findById(id)
-        .orElseThrow();
+        .orElseThrow(
+            ()->new NullPointerException("일정이 존재하지 않습니다.")
+        );
     List<UserResponseDto> userResponseDtos = schedule.getManagedList()
         .stream()
         .map(managed -> {
@@ -76,11 +86,17 @@ public class ScheduleService {
   }
 
   @Transactional
-  public ScheduleResponseDto updateSchedule(Long id, ScheduleRequestDto requestDto) {
+  public ScheduleResponseDto updateSchedule(Long id, ScheduleRequestDto requestDto,
+      HttpServletRequest req) {
     Schedule schedule = scheduleRepository.findById(id)
-        .orElseThrow(); //일정 찾아오기
-    User newUser = findUser(requestDto.getUserId()); //바뀔 유저 Id 찾아오기
-    schedule.update(requestDto, newUser); // 내용, 제목, 작성자 업데이트
+        .orElseThrow(() -> new NullPointerException("해당하는 일정이 존재하지 않습니다."));
+    User user = findUserFromCookie(req); //바뀔 유저 Id 찾아오기
+    if (!user.getId()
+        .equals(schedule.getUser()
+            .getId())) {
+      throw new AuthorizationException(ErrorCode.USER_UNAUTHORIZED);
+    }
+    schedule.update(requestDto); // 내용, 제목, 작성자 업데이트
     if (requestDto.getManagerIds() != null) { //매니저 변경 요청이 있을 경우
       schedule.getManagedList()
           .clear();
@@ -88,9 +104,11 @@ public class ScheduleService {
         User manager = findUser(managerId);
         Managed managed = new Managed(schedule, manager);
         schedule.addManagedList(managed);
+        managedRepository.save(managed);//명시적으로 저장
       }
     }
     Schedule saveSchedule = scheduleRepository.save(schedule);
+    scheduleRepository.flush();//LastModifiedDate 반영
     return new ScheduleResponseDto(saveSchedule);
   }
 
@@ -104,8 +122,17 @@ public class ScheduleService {
         .toList();
   }
 
-  public Long deleteSchedule(Long id) {
-    scheduleRepository.deleteById(id);
+  public Long deleteSchedule(Long id, HttpServletRequest req) {
+    User user = findUserFromCookie(req);
+    Schedule schedule = scheduleRepository.findById(id)
+        .orElseThrow(() -> new NullPointerException("해당하는 일정이 존재하지 않습니다."));
+    if (user.getId()
+        .equals(schedule.getUser()
+            .getId())) {
+      scheduleRepository.delete(schedule);
+    } else {
+      throw new AuthorizationException(ErrorCode.USER_UNAUTHORIZED);
+    }
     return id;
   }
 
@@ -114,6 +141,15 @@ public class ScheduleService {
         .orElseThrow(() ->
             new NullPointerException("유저가 존재하지 않습니다.")
         );
+  }
+
+  @SneakyThrows
+  private User findUserFromCookie(HttpServletRequest req) {
+    String token = jwtUtil.getJwtFromCookie(req);
+    Claims info = jwtUtil.getUserInfoFromToken(token);
+    String email = info.getSubject();
+    return userRepository.findByEmail(email)
+        .orElseThrow(() -> new NullPointerException("유저가 존재하지 않습니다."));
   }
 
   private String getWeather() {

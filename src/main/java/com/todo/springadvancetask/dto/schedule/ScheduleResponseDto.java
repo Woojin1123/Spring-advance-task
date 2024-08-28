@@ -32,7 +32,7 @@ public class ScheduleResponseDto {
     this.contents = schedule.getContents();
     this.createdAt = schedule.getCreatedAt()
         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-    this.updatedAt = schedule.getUpdatedAt()
+    this.updatedAt = schedule.getUpdatedAt() //now()
         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     this.commentCnt = schedule.getCommentList()
         .size();

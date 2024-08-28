@@ -38,9 +38,10 @@ public class AuthenticationFilter implements Filter {
     HttpServletRequest servletRequest = (HttpServletRequest) request;
     String url = servletRequest.getRequestURI();
 
-    if (StringUtils.hasText(url) && (url.equals("/api/users") || url.equals("/api/users/login"))) {
+    if (StringUtils.hasText(url) && (url.equals("/api/users") && servletRequest.getMethod()
+        .equals("POST")) || url.equals("/api/users/login")){
       chain.doFilter(request, response); // 로그인 & 유저등록은 제외
-    } else {
+    } else{
       try { //유저 인증
         String token = jwtUtil.getJwtFromCookie(servletRequest);
         if (StringUtils.hasText(token)) {

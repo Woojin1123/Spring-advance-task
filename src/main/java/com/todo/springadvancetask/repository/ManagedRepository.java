@@ -1,18 +1,8 @@
 package com.todo.springadvancetask.repository;
 
 import com.todo.springadvancetask.entity.Managed;
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface ManagedRepository extends JpaRepository<Managed, Long> {
-
-  Managed findByScheduleIdAndUserId(Long id, Long id1);
-
-  List<Managed> findAllByScheduleId(Long id);
-
-  void deleteAllByScheduleId(Long id);
-
+public interface ManagedRepository extends JpaRepository<Managed,Long> {
 
 }

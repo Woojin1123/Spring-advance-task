@@ -3,6 +3,7 @@ package com.todo.springadvancetask.controller;
 import com.todo.springadvancetask.dto.schedule.ScheduleRequestDto;
 import com.todo.springadvancetask.dto.schedule.ScheduleResponseDto;
 import com.todo.springadvancetask.service.ScheduleService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -43,23 +44,24 @@ public class ScheduleController {
   }
 
   @PostMapping
-  public ResponseEntity<ScheduleResponseDto> createSchedule(@Valid @RequestBody ScheduleRequestDto requestDto) {
-    ScheduleResponseDto responseDto = scheduleService.createSchedule(requestDto);
+  public ResponseEntity<ScheduleResponseDto> createSchedule(@Valid @RequestBody ScheduleRequestDto requestDto,
+      HttpServletRequest req) {
+    ScheduleResponseDto responseDto = scheduleService.createSchedule(requestDto,req);
     return ResponseEntity.status(HttpStatus.OK)
         .body(responseDto);
   }
 
   @PutMapping("/{id}")
   public ResponseEntity<ScheduleResponseDto> updateSchedule(@PathVariable Long id,
-      @RequestBody ScheduleRequestDto requestDto) {
-    ScheduleResponseDto responseDto = scheduleService.updateSchedule(id, requestDto);
+      @RequestBody ScheduleRequestDto requestDto,HttpServletRequest req) {
+    ScheduleResponseDto responseDto = scheduleService.updateSchedule(id, requestDto,req);
     return ResponseEntity.status(HttpStatus.OK)
         .body(responseDto);
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Long> deleteSchedule(@PathVariable Long id) {
-    Long deletedId = scheduleService.deleteSchedule(id);
+  public ResponseEntity<Long> deleteSchedule(@PathVariable Long id,HttpServletRequest req) {
+    Long deletedId = scheduleService.deleteSchedule(id,req);
     return ResponseEntity.status(HttpStatus.ACCEPTED)
         .body(deletedId);
   }

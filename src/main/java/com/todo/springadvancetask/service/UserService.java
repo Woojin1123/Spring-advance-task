@@ -51,7 +51,7 @@ public class UserService {
 
   public UserResponseDto findById(Long userId) {
     User user = userRepository.findById(userId)
-        .orElseThrow();
+        .orElseThrow(()->new NullPointerException("유저가 존재하지 않습니다."));
     return new UserResponseDto(user);
   }
 
@@ -65,7 +65,7 @@ public class UserService {
 
   public UserResponseDto updateUser(Long userId, UserRequestDto requestDto) {
     User user = userRepository.findById(userId)
-        .orElseThrow();
+        .orElseThrow(()->new NullPointerException("유저가 존재하지 않습니다."));
     user.setName(requestDto.getName());
     user.setEmail(requestDto.getEmail());
     user.setRole(requestDto.getRole());

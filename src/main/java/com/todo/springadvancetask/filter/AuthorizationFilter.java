@@ -50,6 +50,6 @@ public class AuthorizationFilter implements Filter {
 
   private boolean isAdminUrl(String url, String method) {
     List<String> cud = Arrays.asList("DELETE", "PUT", "POST");
-    return StringUtils.hasText(url) && (url.startsWith("/api/users") && cud.contains(method));
+    return StringUtils.hasText(url) && (url.startsWith("/api/users") && cud.contains(method)) && !(url.equals("/api/users") || url.equals("/api/users/login"));
   }
 }

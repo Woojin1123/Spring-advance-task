@@ -26,7 +26,7 @@ public class CommentService {
   @Transactional
   public CommentResponseDto createComments(Long scheduleId, CommentRequestDto requestDto) {
     Schedule schedule = scheduleRepository.findById(scheduleId)
-        .orElseThrow();
+        .orElseThrow(()->new NullPointerException("일정이 존재하지 않습니다."));
     Comment comment = new Comment(requestDto);
     Long regId = commentRepository.findRegId(scheduleId);
     comment.setRegId(regId); // 일정에 따라 댓글 번호 설정
@@ -39,7 +39,7 @@ public class CommentService {
 
   public List<CommentResponseDto> findAllBySchedule(Long scheduleId) {
     Schedule schedule = scheduleRepository.findById(scheduleId)
-        .orElseThrow();
+        .orElseThrow(()->new NullPointerException("일정이 존재하지 않습니다."));
     List<Comment> commentList = commentRepository.findAllByScheduleId(scheduleId);
     List<CommentResponseDto> commentResponseDtos = new ArrayList<>();
     CommentResponseDto commentResponseDto;
@@ -52,7 +52,7 @@ public class CommentService {
 
   public CommentResponseDto findByRegId(Long scheduleId, Long regId) {
     Schedule schedule = scheduleRepository.findById(scheduleId)
-        .orElseThrow();
+        .orElseThrow(()->new NullPointerException("일정이 존재하지 않습니다."));
     for (Comment comment : schedule.getCommentList()) {
       if (regId.equals(comment.getRegId())) {
         return new CommentResponseDto(comment);
@@ -72,7 +72,7 @@ public class CommentService {
 
   public CommentResponseDto findById(Long commentId) {
     Comment comment = commentRepository.findById(commentId)
-        .orElseThrow();
+        .orElseThrow(()->new NullPointerException("댓글이 존재하지 않습니다."));
 
     return new CommentResponseDto(comment);
   }
@@ -81,13 +81,14 @@ public class CommentService {
   public CommentResponseDto updateByRegId(Long scheduleId, Long regId,
       CommentRequestDto requestDto) {
     Schedule schedule = scheduleRepository.findById(scheduleId)
-        .orElseThrow();
+        .orElseThrow(()->new NullPointerException("일정이 존재하지 않습니다."));
     List<Comment> commentList = schedule.getCommentList();
     for (Comment comment : commentList) {
       if (comment.getRegId().equals(regId)) {
         comment.setName(requestDto.getName());
         comment.setContents(requestDto.getContents());
         Comment saveComment = commentRepository.save(comment);
+        commentRepository.flush();
         return new CommentResponseDto(saveComment);
       }
     }
@@ -96,7 +97,7 @@ public class CommentService {
 
   public CommentResponseDto updateById(Long commentId, CommentRequestDto requestDto) {
     Comment comment = commentRepository.findById(commentId)
-        .orElseThrow();
+        .orElseThrow(()->new NullPointerException("댓글이 존재하지 않습니다."));
     comment.setContents(requestDto.getContents());
     comment.setName(requestDto.getName());
     Comment saveComment = commentRepository.save(comment);
@@ -105,7 +106,7 @@ public class CommentService {
 
   public Long deleteByRegId(Long scheduleId, Long regId) {
     Schedule schedule = scheduleRepository.findById(scheduleId)
-        .orElseThrow();
+        .orElseThrow(()->new NullPointerException("일정이 존재하지 않습니다."));
     List<Comment> commentList = schedule.getCommentList();
     for (Comment comment : commentList) {
       if (comment.getRegId().equals(regId)) {
@@ -118,7 +119,7 @@ public class CommentService {
 
   public Long deleteById(Long commentId) {
     Comment comment = commentRepository.findById(commentId)
-        .orElseThrow();
+        .orElseThrow(()->new NullPointerException("댓글이 존재하지 않습니다."));
     commentRepository.delete(comment);
     return commentId;
   }

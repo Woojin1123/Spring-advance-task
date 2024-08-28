@@ -56,10 +56,9 @@ public class Schedule extends Timestamped {
     this.title = requestDto.getTitle();
   }
 
-  public void update(ScheduleRequestDto requestDto, User user) {
+  public void update(ScheduleRequestDto requestDto) {
     this.contents = requestDto.getContents();
     this.title = requestDto.getTitle();
-    this.user = user;
   }
 
   public void addCommentList(Comment comment) {
