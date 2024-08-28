@@ -48,7 +48,7 @@ public class ScheduleService {
   public ScheduleResponseDto createSchedule(ScheduleRequestDto requestDto) {
     User user = findUser(requestDto.getUserId());
     Schedule schedule = new Schedule(requestDto);
-    schedule.setUser(user); //작성자
+    schedule.addUser(user); //작성자
     String weather = getWeather();
     schedule.setWeather(weather);
     if (requestDto.getManagerIds() != null) {
@@ -62,7 +62,6 @@ public class ScheduleService {
     return new ScheduleResponseDto(saveSchedule);
   }
 
-  @Transactional(readOnly = true)
   public ScheduleResponseDto findById(Long id) {
     Schedule schedule = scheduleRepository.findById(id)
         .orElseThrow();
@@ -95,7 +94,6 @@ public class ScheduleService {
     return new ScheduleResponseDto(saveSchedule);
   }
 
-  @Transactional(readOnly = true)
   public List<ScheduleResponseDto> getAllSchedules(int pageNo, int pageSize) {
     Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("updatedAt")
         .descending());

@@ -75,4 +75,9 @@ public class Schedule extends Timestamped {
     managed.getUser()
         .addManagedList(managed);
   }
+
+  public void addUser(User user) {
+    this.user = user;
+    user.getScheduleList().add(this);
+  }
 }

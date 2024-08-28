@@ -40,6 +40,11 @@ public class User extends Timestamped {
   @Column(name = "role")
   private String role;
 
+
+  @Getter
+  @OneToMany(mappedBy = "user")
+  private List<Schedule> scheduleList;
+
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Managed> managedList = new ArrayList<>();
 
@@ -51,4 +56,5 @@ public class User extends Timestamped {
   public void addManagedList(Managed managed) {
     this.managedList.add(managed);//연관 관계 설정
   }
+
 }
