@@ -28,30 +28,28 @@ public class AuthorizationFilter implements Filter {
     HttpServletRequest servletRequest = (HttpServletRequest) request;
     String url = servletRequest.getRequestURI();
     String method = servletRequest.getMethod();
-    if (StringUtils.hasText(url) && (url.equals("/api/users") || url.equals("/api/users/login"))) {
+    if (!isAdminUrl(url, method)) {
       chain.doFilter(request, response); // 로그인 & 유저등록은 제외
-      return;
-    }
-    if (isAdminUrl(url,method)){
-      User user = (User)servletRequest.getAttribute("user");
+    }else {
+      User user = (User) servletRequest.getAttribute("user");
       String role = (String) servletRequest.getAttribute("role");
-      if(user.getRole().equals(UserRoleEnum.ADMIN.getAuthority()) && role.equals(UserRoleEnum.ADMIN.getAuthority())) {
+      if (user.getRole()
+          .equals(UserRoleEnum.ADMIN.getAuthority()) && role.equals(
+          UserRoleEnum.ADMIN.getAuthority())) {
         chain.doFilter(request, response);
         return;
-      }else{
+      } else {
         HttpServletResponse res = (HttpServletResponse) response;
         res.setStatus(403);
         res.setCharacterEncoding("utf-8");
         res.getWriter()
             .write("권한이 없습니다.");
       }
-    }else{
-      chain.doFilter(request,response);
-      return;
     }
   }
-  private boolean isAdminUrl(String url,String method){
-    List<String> cud = Arrays.asList("DELETE","PUT","POST");
-    return StringUtils.hasText(url) && (url.startsWith("/api/users") && cud.contains(method)&&(!url.equals("/api/users") && !url.equals("/api/users/login")))||(url.startsWith("/api/schedules") && cud.contains(method));
+
+  private boolean isAdminUrl(String url, String method) {
+    List<String> cud = Arrays.asList("DELETE", "PUT", "POST");
+    return StringUtils.hasText(url) && (url.startsWith("/api/users") && cud.contains(method));
   }
 }

@@ -1,5 +1,7 @@
 package com.todo.springadvancetask.util;
 
+import com.todo.springadvancetask.exception.ErrorCode;
+import com.todo.springadvancetask.exception.custom.AuthenticationException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -90,23 +92,26 @@ public class JwtUtil {
     return null;
   }
 
-  public boolean validateToken(String token) {
+  public void validateToken(String token) {
     try {
       Jwts.parserBuilder()
           .setSigningKey(key)
           .build()
           .parseClaimsJws(token);
-      return true;
     } catch (SecurityException | MalformedJwtException | SignatureException e) {
       logger.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
+      throw new AuthenticationException(ErrorCode.TOKEN_INVALID);
     } catch (ExpiredJwtException e) {
       logger.error("Expired JWT token, 만료된 JWT token 입니다.");
+      throw new AuthenticationException(ErrorCode.TOKEN_EXPIRED);
     } catch (UnsupportedJwtException e) {
       logger.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
+      throw new AuthenticationException(ErrorCode.TOKEN_INVALID);
     } catch (IllegalArgumentException e) {
       logger.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+      throw new AuthenticationException(ErrorCode.TOKEN_INVALID);
     }
-    return false;
+
   }
 
   public Claims getUserInfoFromToken(String token) {

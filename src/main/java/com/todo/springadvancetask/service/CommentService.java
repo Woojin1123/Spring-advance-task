@@ -77,7 +77,7 @@ public class CommentService {
     return new CommentResponseDto(comment);
   }
 
-  @Transactional
+
   public CommentResponseDto updateByRegId(Long scheduleId, Long regId,
       CommentRequestDto requestDto) {
     Schedule schedule = scheduleRepository.findById(scheduleId)
@@ -87,22 +87,22 @@ public class CommentService {
       if (comment.getRegId().equals(regId)) {
         comment.setName(requestDto.getName());
         comment.setContents(requestDto.getContents());
-        return new CommentResponseDto(comment);
+        Comment saveComment = commentRepository.save(comment);
+        return new CommentResponseDto(saveComment);
       }
     }
     throw new NullPointerException("해당 댓글이 존재하지 않습니다.");
   }
 
-  @Transactional
   public CommentResponseDto updateById(Long commentId, CommentRequestDto requestDto) {
     Comment comment = commentRepository.findById(commentId)
         .orElseThrow();
     comment.setContents(requestDto.getContents());
     comment.setName(requestDto.getName());
-    return new CommentResponseDto(comment);
+    Comment saveComment = commentRepository.save(comment);
+    return new CommentResponseDto(saveComment);
   }
 
-  @Transactional
   public Long deleteByRegId(Long scheduleId, Long regId) {
     Schedule schedule = scheduleRepository.findById(scheduleId)
         .orElseThrow();
@@ -116,7 +116,6 @@ public class CommentService {
     throw new NullPointerException("해당 댓글이 존재하지 않습니다.");
   }
 
-  @Transactional
   public Long deleteById(Long commentId) {
     Comment comment = commentRepository.findById(commentId)
         .orElseThrow();

@@ -5,8 +5,8 @@ import com.todo.springadvancetask.dto.user.UserRequestDto;
 import com.todo.springadvancetask.dto.user.UserResponseDto;
 import com.todo.springadvancetask.entity.User;
 import com.todo.springadvancetask.entity.UserRoleEnum;
-import com.todo.springadvancetask.exception.custom.AlreadyExistException;
 import com.todo.springadvancetask.exception.ErrorCode;
+import com.todo.springadvancetask.exception.custom.AlreadyExistException;
 import com.todo.springadvancetask.exception.custom.AuthenticationException;
 import com.todo.springadvancetask.repository.UserRepository;
 import com.todo.springadvancetask.util.JwtUtil;
@@ -14,7 +14,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -30,7 +29,6 @@ public class UserService {
     this.jwtUtil = jwtUtil;
   }
 
-  @Transactional
   public UserResponseDto createUser(UserRequestDto requestDto, HttpServletResponse res) {
     userRepository.findByEmail(requestDto.getEmail())
         .ifPresent(a -> {
@@ -44,12 +42,10 @@ public class UserService {
     } else {
       user.setRole(UserRoleEnum.USER.getAuthority());
     }
-
     User saveUser = userRepository.save(user);
     String token = jwtUtil.createToken(user.getEmail(), user.getRole());
     res.addHeader("Authorization", token);
     jwtUtil.addJwtToCookie(token, res);
-
     return new UserResponseDto(saveUser);
   }
 
@@ -66,13 +62,15 @@ public class UserService {
         .toList();
   }
 
-  @Transactional
+
   public UserResponseDto updateUser(Long userId, UserRequestDto requestDto) {
     User user = userRepository.findById(userId)
         .orElseThrow();
     user.setName(requestDto.getName());
     user.setEmail(requestDto.getEmail());
-    return new UserResponseDto(user);
+    user.setRole(requestDto.getRole());
+    User saveUser = userRepository.save(user);
+    return new UserResponseDto(saveUser);
   }
 
   public Long deleteUser(Long userId) {

@@ -40,7 +40,6 @@ public class AuthenticationFilter implements Filter {
 
     if (StringUtils.hasText(url) && (url.equals("/api/users") || url.equals("/api/users/login"))) {
       chain.doFilter(request, response); // 로그인 & 유저등록은 제외
-      return;
     } else {
       try { //유저 인증
         String token = jwtUtil.getJwtFromCookie(servletRequest);
@@ -52,7 +51,6 @@ public class AuthenticationFilter implements Filter {
           request.setAttribute("user", user);
           request.setAttribute("role", info.get("role"));
           chain.doFilter(request, response);
-          return;
         } else {
           HttpServletResponse res = (HttpServletResponse) response;
           res.setStatus(400);
