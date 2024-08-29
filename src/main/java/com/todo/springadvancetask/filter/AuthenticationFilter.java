@@ -39,7 +39,7 @@ public class AuthenticationFilter implements Filter {
     String url = servletRequest.getRequestURI();
 
     if (StringUtils.hasText(url) && (url.equals("/api/users") && servletRequest.getMethod()
-        .equals("POST")) || url.equals("/api/users/login")){
+        .equals("POST")) || url.equals("/api/users/login") || servletRequest.getMethod().equals("GET")){
       chain.doFilter(request, response); // 로그인 & 유저등록은 제외
     } else{
       try { //유저 인증
